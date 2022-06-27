@@ -1,0 +1,41 @@
+{
+    "name": "oskobri/database-translation-sheet",
+    "description": "A package that allows you to translate with google sheet your translated models",
+    "keywords": [
+        "oskobri",
+        "laravel",
+        "database-translation-sheet"
+    ],
+    "homepage": "https://github.com/oskobri/database-translation-sheet",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Boris Obrembski",
+            "email": "oskobri@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "google/apiclient": "^2.1",
+        "illuminate/database": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/console": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Oskobri\\DatabaseTranslationSheet\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Oskobri\\DatabaseTranslationSheet\\DatabaseTranslationSheetServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
