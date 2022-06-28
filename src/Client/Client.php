@@ -1,6 +1,6 @@
 <?php
 
-namespace Oskobri\DatabaseTranslationSheet\Clients;
+namespace Oskobri\DatabaseTranslationSheet\Client;
 
 class Client
 {

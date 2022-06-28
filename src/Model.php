@@ -1,10 +1,11 @@
 <?php
 
-namespace Oskobri\DatabaseTranslationSheet\Translations;
+namespace Oskobri\DatabaseTranslationSheet;
 
 class Model
 {
     private \Illuminate\Database\Eloquent\Model $model;
+    private array $locales;
 
     public function __construct($model)
     {

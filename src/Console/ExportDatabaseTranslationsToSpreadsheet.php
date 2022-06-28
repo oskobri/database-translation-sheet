@@ -3,8 +3,8 @@
 namespace Oskobri\DatabaseTranslationSheet\Console;
 
 use Illuminate\Console\Command;
-use Oskobri\DatabaseTranslationSheet\Clients\SpreadSheet;
-use Oskobri\DatabaseTranslationSheet\Translations\Model;
+use Oskobri\DatabaseTranslationSheet\Client\SpreadSheet;
+use Oskobri\DatabaseTranslationSheet\SheetExporter;
 use Oskobri\DatabaseTranslationSheet\Util;
 
 class ExportDatabaseTranslationsToSpreadsheet extends Command
@@ -19,18 +19,19 @@ class ExportDatabaseTranslationsToSpreadsheet extends Command
 
         $this->info('Exporting translations to spreadsheet ...');
 
-        collect(config('database-translation-sheet.models'))->each(function ($modelClass) use ($spreadsheet) {
-            $model = new $modelClass();
+        try {
+            collect(config('database-translation-sheet.models'))->each(function ($modelClass) use ($spreadsheet) {
+                $model = new $modelClass();
+                $sheetTitle = Util::snakeCaseToWords($model->getTable());
 
-            $sheetTitle = Util::snakeCaseToWords($model->getTable());
-            $this->info("... $sheetTitle");
+                $this->info("... $sheetTitle");
 
-            $spreadsheet->writeSheet(
-                Util::snakeCaseToWords($model->getTable()),
-                (new Model($model))->getSheetRows()
-            );
-        });
+                (new SheetExporter($spreadsheet))->export($model);
+            });
 
-        $this->info('Done !');
+            $this->info('Done !');
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 }

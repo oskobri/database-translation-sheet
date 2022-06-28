@@ -1,14 +1,16 @@
 <?php
 
-namespace Oskobri\DatabaseTranslationSheet\Clients;
+namespace Oskobri\DatabaseTranslationSheet\Client;
 
 use Google_Service_Sheets;
 use Google_Service_Sheets_BatchUpdateSpreadsheetRequest;
+use Google_Service_Sheets_Spreadsheet;
 use Google_Service_Sheets_ValueRange;
 
 class SpreadSheet
 {
     private $spreadsheetId;
+    private Google_Service_Sheets $client;
 
     public function __construct()
     {
@@ -16,16 +18,16 @@ class SpreadSheet
         $this->client = new Google_Service_Sheets((new Client())->getClient());
     }
 
-    public function getSpreadSheet()
+    public function getSpreadSheet(): Google_Service_Sheets_Spreadsheet
     {
         return $this->client
             ->spreadsheets
             ->get($this->spreadsheetId);
     }
 
-    public function getSheets(): array
+    public function getSheets(): \Illuminate\Support\Collection
     {
-        return $this->getSpreadSheet()->getSheets();
+        return collect($this->getSpreadSheet()->getSheets());
     }
 
     public function getSheetDetails($sheetTitle): Google_Service_Sheets_ValueRange
@@ -33,7 +35,7 @@ class SpreadSheet
         return $this->client->spreadsheets_values->get($this->spreadsheetId, $sheetTitle);
     }
 
-    public function addSheet(string $sheetTitle)
+    public function addSheet($sheetTitle)
     {
         $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
             'requests' => [
@@ -49,7 +51,6 @@ class SpreadSheet
 
         $this->updateSheetProperties($response->getReplies()[0]->getAddSheet()->getProperties()->getSheetId());
     }
-
 
     public function updateSheetProperties($sheetId)
     {
@@ -106,7 +107,7 @@ class SpreadSheet
         $this->client->spreadsheets->batchUpdate($this->spreadsheetId, $body);
     }
 
-    public function writeSheet(string $sheetTitle, array $rows)
+    public function writeSheet($sheetTitle, $rows)
     {
         if (!$this->doesSheetExist($sheetTitle)) {
             $this->addSheet($sheetTitle);

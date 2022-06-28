@@ -2,7 +2,6 @@
 
 namespace Oskobri\DatabaseTranslationSheet;
 
-
 class Util
 {
     public static function snakeCaseToWords($snake_case): string

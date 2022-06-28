@@ -4,8 +4,8 @@ namespace Oskobri\DatabaseTranslationSheet\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Oskobri\DatabaseTranslationSheet\Clients\SpreadSheet;
-use Oskobri\DatabaseTranslationSheet\Util;
+use Oskobri\DatabaseTranslationSheet\Client\SpreadSheet;
+use Oskobri\DatabaseTranslationSheet\SheetImporter;
 
 class ImportTranslationSheetToDatabase extends Command
 {
@@ -15,52 +15,24 @@ class ImportTranslationSheetToDatabase extends Command
 
     public function handle()
     {
-        $spreadsheet = new Spreadsheet();
-
         $this->info('Importing translations to database ...');
 
-        foreach ($spreadsheet->getSheets() as $sheet) {
-            $sheetTitle = $sheet->getProperties()->getTitle();
-            $this->info("... $sheetTitle");
-
-            $this->importTranslationSheetToDatabase($spreadsheet, $sheetTitle);
-        }
-
-        $this->info('Done !');
-    }
-
-    public function importTranslationSheetToDatabase($spreadsheet, $sheetTitle)
-    {
         try {
-            $sheetDetails = $spreadsheet->getSheetDetails($sheetTitle);
-            $rows = collect($sheetDetails->getValues());
-            $header = $this->formatHeaderToDatabaseColumn($rows->shift());
-            $columnsCount = count($header);
+            DB::transaction(function () {
+                ($spreadsheet = new Spreadsheet())
+                    ->getSheets()
+                    ->each(function ($sheet) use ($spreadsheet) {
+                        $sheetTitle = $sheet->getProperties()->getTitle();
 
-            $rows->each(function ($row) use ($header, $sheetTitle, $columnsCount) {
+                        $this->info("... $sheetTitle");
 
-                // Fill the missing columns with empty values
-                $row = array_pad($row,  $columnsCount, '');
-
-                $columns = array_combine($header, $row);
-
-                // Primary key is the first column
-                $condition = array_splice($columns, 0, 1);
-
-                DB::table(Util::wordsToSnakeCase($sheetTitle))
-                    ->where($condition)
-                    ->update($columns);
+                        (new SheetImporter($spreadsheet))->import($sheetTitle);
+                    });
             });
+
+            $this->info('Done !');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
-            dd($rows);
         }
-    }
-
-    public function formatHeaderToDatabaseColumn($header): array
-    {
-        return array_map(function ($headerColumn) {
-            return Util::headerLocaleToDatabaseColumn($headerColumn);
-        }, $header);
     }
 }
