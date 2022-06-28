@@ -6,12 +6,16 @@
 > :warning: **This package requires you use [spatie/laravel-translatable](https://github.com/spatie/laravel-translatable) trait on your models.**
 
 ## Installation
-```bash $ composer require oskobri/database-translation-sheet --dev  
+```bash
+ $ composer require oskobri/database-translation-sheet --dev  
 ```   
 Configuration file need to be published to add your translated models.
 
 
-```bash $ php artisan vendor:publish --provider="Oskobri\DatabaseTranslationSheet\DatabaseTranslationSheetServiceProvider" ```   
+```bash 
+$ php artisan vendor:publish --provider="Oskobri\DatabaseTranslationSheet\DatabaseTranslationSheetServiceProvider" 
+```   
+
 TODO:
 - Configuration (Google sheet / models)
 - Usage
